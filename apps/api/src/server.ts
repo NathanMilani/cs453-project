@@ -1,6 +1,7 @@
 import express from "express";
 import { env } from "./config/env";
 import { pool } from "./db/pool";
+import taskRoutes from "./routes/taskRoutes";
 
 const app = express();
 
@@ -30,28 +31,7 @@ app.get("/db-health", async (_req, res) => {
 	}
 });
 
-app.get("/tasks", async (_req, res) => {
-	try {
-		const result = await pool.query(
-			`SELECT id,
-                    title,
-                    description,
-                    status,
-                    created_at AS "createdAt",
-                    updated_at AS "updatedAt"
-             FROM tasks
-             ORDER BY id `,
-		);
-
-		res.json(result.rows);
-	} catch (error) {
-		console.error("Failed to fetch tasks:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to fetch tasks",
-		});
-	}
-});
+app.use("/tasks", taskRoutes);
 
 app.listen(env.port, () => {
 	console.log(`Server running at http://localhost:${env.port}`);

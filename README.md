@@ -139,14 +139,21 @@ cd cs453-project-template
 This project uses Docker to run PostgreSQL locally.
 
 ```shell
-docker-compose up -d
+docker compose up -d
 ```
 
 This will start a PostgreSQL database container.
 
 ---
 
-## 3. Install dependencies
+## 3. Creating the Database Tables
+
+```shell
+Get-Content database/schema.sql | docker exec -i cs453-postgres psql -U postgres -d cs453
+```
+
+
+## 4. Install dependencies
 
 ```shell
 cd apps/api
@@ -155,7 +162,7 @@ npm install
 
 ---
 
-## 4. Run the server
+## 5. Run the server
 ```shell
 npm run dev
 ```
@@ -231,3 +238,65 @@ from other students or online repositories is considered academic misconduct.
 # License
 
 This repository is provided for educational use in CS453/553.
+
+# Checkpoint 1 Features
+
+After going through the first Checkpoint assignment, I have gone into the repository and made the changes to add the core required features:
+ - Express REST API
+ - PostgreSQL database integration
+ - Docker support for PostgreSQL
+ - Task CRUD operations
+    - GET /tasks
+    - POST /tasks
+    - GET /tasks/:id
+    - PATCH /tasks/:id
+    - DELETE /tasks/:id
+ - Request validation
+ - JSON error responses
+ - Refactored architecture using routes, services, and database modules
+
+Here is how I set up the database tables on a windows environment:
+ 1. cloned the repository to my local computer
+ 2. used the command: docker compose up -d
+    - Then I typed this to create the table for the data id to be stored:
+        -Get-Content database/schema.sql | docker exec -i cs453-postgres psql -U postgres -d cs453
+ 3. typed npm install
+ 4. npm run dev
+Thats how I was able to get my docker set up for my database tables.
+
+I also used the Thunder Client extension inside of VSCode to test the following endpoints:
+    1. GET /health
+    2. GET /db-health
+    3. GET /tasks
+    4. POST /tasks
+    5. GET /tasks/:id
+    6. PATCH /tasks/:id
+    7. DELETE /tasks/:id
+All of these work and can be ran functionally.
+
+# Reflection Questions
+Answer the following questions in your README or in a separate file such as answers.md.
+
+1. What is the difference between an in-memory API and a database-backed API?
+My answer:
+The difference between these two is how the API stores and accesses data. An in-memory API stores all of its data directly in memory while the program is running, so if the server is shut down all of the data is lost. A database-backed API stores the data in a database like PostgreSQL and retrieves it by making database queries, so the data is still there even after the server restarts.
+
+2. Why is it useful to separate routes, services, and database logic?
+My answer:
+Because it makes the architecture of the project much more organized and easier to read. It also makes the code easier to maintain since the routes handle the HTTP requests, the services handle the application logic, and the database layer handles communicating with PostgreSQL.
+
+3. What HTTP status codes did you use, and why?
+My answer:
+I used status codes 200, 201, 204, 400, 404, and 500 for this checkpoint. These codes let the client know what happened after making a request. A 200 means the request was successful, 201 means a new task was created successfully, 204 means a task was deleted successfully, 400 means the client sent invalid input, 404 means the requested task does not exist, and 500 means an unexpected server or database error occurred. Without these status codes it would be much harder to know whether a GET, POST, PATCH, or DELETE request worked correctly.
+
+4. What happens when a client requests a task ID that does not exist?
+My answer:
+It will return a 404 Not Found status code along with a JSON error message saying that the task was not found.
+
+5. What was the hardest part of connecting the API to PostgreSQL?
+My answer:
+The hardest part was learning what commands to run in the VS Code terminal and getting PostgreSQL connected correctly through Docker. These are the commands I used:
+ 1. docker compose up -d
+ 2. Get-Content database/schema.sql | docker exec -i cs453-postgres psql -U postgres -d cs453
+ 3. npm run dev
+After everything was running, I used the Thunder Client extension in VS Code to test all of my GET, POST, PATCH, and DELETE endpoints to make sure they were working correctly.
