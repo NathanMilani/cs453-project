@@ -272,47 +272,127 @@ Added:
 
 # Testing
 
-The API was tested using the Thunder Client extension in VS Code and PowerShell.
+This project was manually tested using the Thunder Client extension in VS Code and PowerShell.
 
-Verified endpoints:
+## Health Endpoints
 
-### Health
+✔ GET /health
 
-- GET /health
-- GET /db-health
+- Verified the server is running.
+- Expected Status: 200 OK
 
-### Authentication
+✔ GET /db-health
 
-- POST /auth/register
-- POST /auth/login
+- Verified PostgreSQL connection.
+- Expected Status: 200 OK
 
-### Projects
+---
 
-- GET /projects
-- POST /projects
-- GET /projects/:id
+## Authentication
 
-### Tasks
+✔ POST /auth/register
 
-- GET /tasks
-- POST /tasks
-- GET /tasks/:id
-- PATCH /tasks/:id
-- DELETE /tasks/:id
+- Successfully created a new user.
+- Password stored as a bcrypt hash.
+- Expected Status: 201 Created
 
-### Users
+✔ POST /auth/login
 
-- GET /users
+- Successfully returned a JWT token.
+- Expected Status: 200 OK
 
-Additional scenarios tested:
+✔ Duplicate Registration
 
-- Duplicate email registration
-- Invalid login credentials
-- Missing authentication token
+- Attempted to register the same email twice.
+- Returned:
+  - Status: 409 Conflict
+
+✔ Invalid Login
+
+- Attempted login using an incorrect password.
+- Returned:
+  - Status: 401 Unauthorized
+
+---
+
+## Projects
+
+✔ POST /projects
+
+- Successfully created a project for the authenticated user.
+- Expected Status: 201 Created
+
+✔ GET /projects
+
+- Successfully returned projects owned by the authenticated user.
+- Expected Status: 200 OK
+
+✔ GET /projects/:id
+
+- Verified owner can access the project.
+- Verified another user receives:
+  - Status: 403 Forbidden
+
+- Verified requesting a non-existent project returns:
+  - Status: 404 Not Found
+
+---
+
+## Tasks
+
+✔ POST /tasks
+
+- Successfully created a task inside a project.
+
+✔ GET /tasks
+
+- Returned tasks belonging to the authenticated user.
+
+✔ PATCH /tasks/:id
+
+- Verified project owner can update a task.
+- Verified another user receives:
+  - Status: 403 Forbidden
+
+✔ DELETE /tasks/:id
+
+- Successfully deleted an existing task.
+
+---
+
+## Administrator Authorization
+
+✔ GET /users
+
+Normal authenticated user:
+
+- Returned:
+  - 403 Forbidden
+
+Administrator account:
+
+- Returned:
+  - 200 OK
+  - List of registered users
+
+---
+
+## Manual Testing Summary
+
+The following scenarios were verified successfully:
+
+- User registration
+- User login
+- Password hashing
+- JWT authentication
+- Duplicate email handling
+- Invalid login
+- Protected routes
 - Administrator-only routes
 - Project ownership
 - Task ownership
-- JWT authentication
+- CRUD operations for projects and tasks
+- PostgreSQL database persistence
 
 ---
 
