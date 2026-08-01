@@ -2,10 +2,19 @@ import express from "express";
 import { env } from "./config/env";
 import { pool } from "./db/pool";
 import taskRoutes from "./routes/taskRoutes";
+import authRoutes from "./routes/authRoutes";
+import { authenticate } from "./middleware/authenticate";
+import projectRoutes from "./routes/projectRoutes";
+import { requireAdmin } from "./middleware/authorize";
+import userRoutes from "./routes/userRoutes";
 
 const app = express();
 
 app.use(express.json());
+app.use("/auth", authRoutes);
+app.use("/users", authenticate,	requireAdmin, userRoutes,);
+app.use("/projects", authenticate, projectRoutes);
+
 
 app.get("/health", (_req, res) => {
 	res.json({
@@ -31,7 +40,7 @@ app.get("/db-health", async (_req, res) => {
 	}
 });
 
-app.use("/tasks", taskRoutes);
+app.use("/tasks", authenticate, taskRoutes);
 
 app.listen(env.port, () => {
 	console.log(`Server running at http://localhost:${env.port}`);
