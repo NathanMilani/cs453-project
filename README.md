@@ -130,6 +130,8 @@ JWT_SECRET=replace-with-your-secret-key
 PORT=3000
 ```
 
+JWT_SECRET is used to sign and verify JWT tokens. Replace it with your own secure secret before running the application.
+
 ---
 
 ## 5. Install dependencies
@@ -155,6 +157,14 @@ http://localhost:3000
 
 ---
 
+# Running Tests
+
+This project was manually tested using:
+
+- Thunder Client
+- Windows PowerShell
+
+The Testing section below documents every endpoint that was verified and the expected HTTP status codes.
 # API Endpoints
 
 ## Health
@@ -174,6 +184,36 @@ POST /auth/login
 ```
 
 ---
+
+## Registering and Logging In
+
+Register a new user:
+
+```
+POST /auth/register
+```
+
+Log in using the registered email and password:
+
+```
+POST /auth/login
+```
+
+A successful login returns a JWT token that must be included in the `Authorization` header when accessing protected routes.
+
+## Creating an Administrator Account
+
+Newly registered users are created with the default role of `user`.
+
+To make a user an administrator, run the following command from the project directory:
+
+```powershell
+docker exec -it cs453-postgres `
+    psql -U postgres -d cs453 `
+    -c "UPDATE users SET role = 'admin' WHERE email = 'your-email@example.com';"
+```
+
+After changing the user's role, log in again so a new JWT is generated with the updated administrator role.
 
 ## Projects
 
@@ -216,8 +256,31 @@ After logging in, the API returns a JWT token.
 Protected routes require:
 
 ```
+Example Authorization header:
+
+```text
 Authorization: Bearer <jwt-token>
 ```
+
+Example using PowerShell:
+
+```powershell
+$login = Invoke-RestMethod `
+    -Uri "http://localhost:3000/auth/login" `
+    -Method Post `
+    -ContentType "application/json" `
+    -Body '{
+        "email":"your-email@example.com",
+        "password":"your-password"
+    }'
+
+Invoke-RestMethod `
+    -Uri "http://localhost:3000/tasks" `
+    -Method Get `
+    -Headers @{
+        Authorization = "Bearer $($login.token)"
+    }
+``````
 
 ---
 
@@ -229,7 +292,13 @@ The application protects the following routes:
 - /projects
 - /users
 
-Authenticated users may only access resources they own.
+The application enforces the following authorization rules:
+
+- Users must authenticate before accessing protected routes.
+- Users may only access projects that they own.
+- Users may only modify tasks belonging to projects they own.
+- Administrators can access the `/users` endpoint.
+- Administrators may bypass ownership restrictions when managing projects and tasks.
 
 Administrators may access administrator-only routes and bypass ownership restrictions where appropriate.
 
@@ -432,8 +501,7 @@ The hardest part was learning the Docker and PowerShell commands needed to conne
 
 ## 1. What is the difference between authentication and authorization?
 
-Authentication is the what is used in verifying if the user is who they say they are. Authorization is the what users right to be given permission to a given task or information.
-
+Authentication is used to verify that the user is who they say they are by checking their login credentials. Authorization determines what that authenticated user is allowed to access or modify, such as projects, tasks, or administrator-only routes.
 ---
 
 ## 2. Why should passwords be hashed instead of stored directly?
