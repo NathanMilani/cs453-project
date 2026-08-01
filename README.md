@@ -352,7 +352,7 @@ The hardest part was learning the Docker and PowerShell commands needed to conne
 
 ## 1. What is the difference between authentication and authorization?
 
-Authentication verifies who a user is by checking their login credentials. Authorization determines what that authenticated user is allowed to access or modify.
+Authentication is the what is used in verifying if the user is who they say they are. Authorization is the what users right to be given permission to a given task or information.
 
 ---
 
@@ -388,4 +388,4 @@ The users table stores user accounts. Each project belongs to one user through t
 
 ## 7. What was the hardest part of adding authentication or authorization?
 
-The hardest part was understanding how bcrypt, JWT authentication, middleware, and authorization all worked together. After implementing each part, I tested every endpoint using Thunder Client and PowerShell to make sure authentication and authorization behaved correctly.
+The hard part was when trying to get the bcrypt, JWT authorization, middleware, and the authorization to work without problems. Since all of these are interconnected with one another, testing was a bit hard. However, after doing a lot of testing, there are no bugs and the authorization works as intended.
